@@ -5,7 +5,7 @@ import {
   Plus,
   Search,
   Clock,
-  UserStethoscope,
+  Stethoscope,
   Users,
   Filter,
   Edit,
@@ -385,7 +385,7 @@ const Appointments = () => {
                           {patient?.name || 'Unknown Patient'}
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
-                          <UserStethoscope className="h-4 w-4 mr-2 text-gray-400" />
+                          <Stethoscope className="h-4 w-4 mr-2 text-gray-400" />
                           Dr. {doctor?.name || 'Unknown Doctor'}
                         </div>
                       </div>

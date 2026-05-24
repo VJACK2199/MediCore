@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('medicore_user');
+    const storedUser = localStorage.getItem('akruti_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -24,12 +24,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('medicore_user', JSON.stringify(userData));
+    localStorage.setItem('akruti_user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('medicore_user');
+    localStorage.removeItem('akruti_user');
   };
 
   const value = {

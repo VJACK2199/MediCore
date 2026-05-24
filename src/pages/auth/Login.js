@@ -52,7 +52,7 @@ const Login = () => {
             <Stethoscope className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to MediCore
+            Sign in to Akruti
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Hospital & Clinic Management System

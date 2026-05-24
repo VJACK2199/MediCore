@@ -1,4 +1,4 @@
-# MediCore - Hospital & Clinic Management System
+# Akruti - Hospital & Clinic Management System
 
 A comprehensive, modern, and responsive Hospital & Clinic Management Website UI built with React, Tailwind CSS, and Lucide React icons.
 
@@ -46,7 +46,7 @@ A comprehensive, modern, and responsive Hospital & Clinic Management Website UI 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd medicore
+cd akruti
 ```
 
 2. Install dependencies:
@@ -199,24 +199,24 @@ For support, please contact the development team or open an issue in the reposit
 
 ######################################################################################################################################################################################################################
 
-## 🎉 MediCore Hospital Management System - SUCCESSFULLY RUNNING!
+## 🎉 Akruti Hospital Management System - SUCCESSFULLY RUNNING!
 
 **🌐 Access URL:** http://localhost:3000
 
 ### 🔑 Login Credentials (Demo Accounts):
 
 **Admin Access:**
-- Email: `admin@medicore.com`
+- Email: `admin@akruti.com`
 - Password: `admin123`
 - Role: Admin
 
 **Doctor Access:**
-- Email: `doctor@medicore.com` 
+- Email: `doctor@akruti.com`
 - Password: `doctor123`
 - Role: Doctor
 
 **Staff Access:**
-- Email: `staff@medicore.com`
+- Email: `staff@akruti.com`
 - Password: `staff123`
 - Role: Staff
 

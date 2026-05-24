@@ -53,7 +53,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
@@ -61,7 +61,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <Stethoscope className="h-5 w-5 text-white" />
             </div>
-            <span className="ml-2 text-xl font-bold text-gray-900">MediCore</span>
+            <span className="ml-2 text-xl font-bold text-gray-900">Akruti</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -88,7 +88,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="px-4 py-6 space-y-2">
             {filteredNavigation.map((item) => {
               const Icon = item.icon;
               return (
@@ -103,10 +103,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 </Link>
               );
             })}
-          </nav>
 
-          {/* Bottom actions */}
-          <div className="px-4 py-4 border-t border-gray-200 space-y-2">
             <button className="sidebar-item w-full">
               <Settings className="h-5 w-5 mr-3" />
               Settings
@@ -118,7 +115,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <LogOut className="h-5 w-5 mr-3" />
               Logout
             </button>
-          </div>
+          </nav>
         </div>
       </div>
     </>

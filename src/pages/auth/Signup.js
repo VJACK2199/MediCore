@@ -69,7 +69,7 @@ const Signup = () => {
             Create Your Account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Join MediCore Hospital Management System
+            Join Akruti Hospital Management System
           </p>
         </div>
         

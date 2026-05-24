@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
 import {
-  UserStethoscope,
+  Stethoscope,
   Plus,
   Search,
   Edit,
@@ -316,7 +316,7 @@ const DoctorManagement = () => {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center">
                 <div className="h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <UserStethoscope className="h-6 w-6 text-primary-600" />
+                  <Stethoscope className="h-6 w-6 text-primary-600" />
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-semibold text-gray-900">{doctor.name}</h3>
