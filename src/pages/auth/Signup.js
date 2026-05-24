@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Lock, Mail, Stethoscope, Building, Users, Phone, MapPin } from 'lucide-react';
+import { User, Lock, Mail, Stethoscope, Users, Phone, MapPin } from 'lucide-react';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -9,14 +9,14 @@ const Signup = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'admin',
+    role: 'staff',
     phone: '',
     department: '',
     specialization: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -38,18 +38,20 @@ const Signup = () => {
     }
 
     try {
+      const role = formData.role === 'doctor' ? 'doctor' : 'staff';
       const userData = {
         id: Date.now(),
         name: formData.name,
         email: formData.email,
-        role: formData.role,
+        password: formData.password,
+        role,
         phone: formData.phone,
         department: formData.department,
         specialization: formData.specialization,
-        permissions: formData.role === 'admin' ? ['all'] : formData.role === 'doctor' ? ['patients', 'appointments', 'schedule'] : ['patients', 'appointments', 'billing']
+        permissions: role === 'doctor' ? ['patients', 'appointments', 'schedule'] : ['patients', 'appointments', 'billing']
       };
       
-      login(userData);
+      register(userData);
       navigate('/dashboard');
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -85,19 +87,7 @@ const Signup = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Your Role
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, role: 'admin' })}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    formData.role === 'admin'
-                      ? 'border-primary-500 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Building className="h-6 w-6 mx-auto mb-1" />
-                  <span className="text-xs">Admin</span>
-                </button>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: 'doctor' })}

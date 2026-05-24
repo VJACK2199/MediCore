@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Calendar,
   Plus,
@@ -17,13 +18,19 @@ import {
 
 const Appointments = () => {
   const { appointments, setAppointments, patients, doctors } = useData();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [formData, setFormData] = useState({
     patientId: '',
+    patientName: '',
+    patientEmail: '',
+    patientPhone: '',
+    department: 'General Medicine',
     doctorId: '',
+    token: '',
     date: '',
     time: '',
     type: 'Consultation',
@@ -31,13 +38,24 @@ const Appointments = () => {
     status: 'pending'
   });
 
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = 
+  const visibleAppointments = appointments.filter((appointment) => {
+    if (user?.role === 'doctor') {
+      return appointment.doctorId === user.id;
+    }
+    return true;
+  });
+
+  const filteredAppointments = visibleAppointments.filter((appointment) => {
+    const patient = patients.find(p => p.id === appointment.patientId);
+    const patientName = appointment.patientId ? patient?.name : appointment.patientName;
+    const matchesSearch =
+      appointment.token?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (patientName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.patientEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.notes.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesFilter = filterStatus === 'all' || appointment.status === filterStatus;
-    
     return matchesSearch && matchesFilter;
   });
 
@@ -50,25 +68,33 @@ const Appointments = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
+    const appointmentToken = formData.token || `AKR-${Math.floor(1000 + Math.random() * 9000)}`;
+
     if (editingAppointment) {
       setAppointments(appointments.map(apt =>
         apt.id === editingAppointment.id
-          ? { ...formData, id: editingAppointment.id }
+          ? { ...formData, id: editingAppointment.id, token: appointmentToken }
           : apt
       ));
       setEditingAppointment(null);
     } else {
       const newAppointment = {
         id: Date.now(),
+        token: appointmentToken,
         ...formData
       };
-      setAppointments([...appointments, newAppointment]);
+      setAppointments([newAppointment, ...appointments]);
     }
-    
+
     setFormData({
       patientId: '',
+      patientName: '',
+      patientEmail: '',
+      patientPhone: '',
+      department: 'General Medicine',
       doctorId: '',
+      token: '',
       date: '',
       time: '',
       type: 'Consultation',
@@ -81,8 +107,13 @@ const Appointments = () => {
   const handleEdit = (appointment) => {
     setEditingAppointment(appointment);
     setFormData({
-      patientId: appointment.patientId,
-      doctorId: appointment.doctorId,
+      patientId: appointment.patientId || '',
+      patientName: appointment.patientName || '',
+      patientEmail: appointment.patientEmail || '',
+      patientPhone: appointment.patientPhone || '',
+      department: appointment.department || 'General Medicine',
+      doctorId: appointment.doctorId || '',
+      token: appointment.token || '',
       date: appointment.date,
       time: appointment.time,
       type: appointment.type,
@@ -164,7 +195,12 @@ const Appointments = () => {
                 setEditingAppointment(null);
                 setFormData({
                   patientId: '',
+                  patientName: '',
+                  patientEmail: '',
+                  patientPhone: '',
+                  department: 'General Medicine',
                   doctorId: '',
+                  token: '',
                   date: '',
                   time: '',
                   type: 'Consultation',
@@ -182,15 +218,24 @@ const Appointments = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Patient *
+                  Patient
                 </label>
                 <select
                   className="input"
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-                  required
+                  onChange={(e) => {
+                    const patientId = e.target.value;
+                    const selectedPatient = patients.find(patient => String(patient.id) === patientId);
+                    setFormData({
+                      ...formData,
+                      patientId,
+                      patientName: selectedPatient?.name || '',
+                      patientEmail: selectedPatient?.email || '',
+                      patientPhone: selectedPatient?.phone || ''
+                    });
+                  }}
                 >
-                  <option value="">Select Patient</option>
+                  <option value="">Select Patient or create a new request</option>
                   {patients.map(patient => (
                     <option key={patient.id} value={patient.id}>
                       {patient.name}
@@ -201,20 +246,81 @@ const Appointments = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Doctor *
+                  Doctor
                 </label>
                 <select
                   className="input"
                   value={formData.doctorId}
                   onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
-                  required
                 >
                   <option value="">Select Doctor</option>
-                  {doctors.filter(doc => doc.available).map(doctor => (
+                  {doctors.map((doctor) => (
                     <option key={doctor.id} value={doctor.id}>
-                      Dr. {doctor.name} - {doctor.specialization}
+                      {doctor.name.replace(/^Dr\.\s*/i, 'Dr. ')} - {doctor.specialization}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {!formData.patientId && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Patient Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="input"
+                      value={formData.patientName}
+                      onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+                      placeholder="Full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      className="input"
+                      value={formData.patientEmail}
+                      onChange={(e) => setFormData({ ...formData, patientEmail: e.target.value })}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      className="input"
+                      value={formData.patientPhone}
+                      onChange={(e) => setFormData({ ...formData, patientPhone: e.target.value })}
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Department
+                </label>
+                <select
+                  className="input"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                >
+                  <option value="General Medicine">General Medicine</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="ENT">ENT</option>
                 </select>
               </div>
 
@@ -280,6 +386,18 @@ const Appointments = () => {
                   <option value="completed">Completed</option>
                 </select>
               </div>
+
+              {formData.token && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Appointment Token</label>
+                  <input
+                    type="text"
+                    className="input bg-gray-100"
+                    value={formData.token}
+                    disabled
+                  />
+                </div>
+              )}
             </div>
 
             <div>
@@ -301,6 +419,20 @@ const Appointments = () => {
                 onClick={() => {
                   setShowAddForm(false);
                   setEditingAppointment(null);
+                  setFormData({
+                    patientId: '',
+                    patientName: '',
+                    patientEmail: '',
+                    patientPhone: '',
+                    department: 'General Medicine',
+                    doctorId: '',
+                    token: '',
+                    date: '',
+                    time: '',
+                    type: 'Consultation',
+                    notes: '',
+                    status: 'pending'
+                  });
                 }}
                 className="btn btn-secondary px-4 py-2"
               >
@@ -352,7 +484,13 @@ const Appointments = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Patient & Doctor
+                  Token
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Patient
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Doctor
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date & Time
@@ -375,26 +513,44 @@ const Appointments = () => {
               {filteredAppointments.map((appointment) => {
                 const patient = patients.find(p => p.id === appointment.patientId);
                 const doctor = doctors.find(d => d.id === appointment.doctorId);
-                
+                const patientName = appointment.patientId ? patient?.name : appointment.patientName;
+                const patientEmail = appointment.patientId ? patient?.email : appointment.patientEmail;
+                const patientPhone = appointment.patientId ? patient?.phone : appointment.patientPhone;
+
                 return (
                   <tr key={appointment.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className="inline-flex px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                        {appointment.token || 'N/A'}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="space-y-1">
                         <div className="flex items-center text-sm text-gray-900">
                           <Users className="h-4 w-4 mr-2 text-gray-400" />
-                          {patient?.name || 'Unknown Patient'}
+                          {patientName || 'Unknown Patient'}
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Stethoscope className="h-4 w-4 mr-2 text-gray-400" />
-                          Dr. {doctor?.name || 'Unknown Doctor'}
-                        </div>
+                        {patientEmail && (
+                          <div className="text-xs text-gray-500">{patientEmail}</div>
+                        )}
+                        {patientPhone && (
+                          <div className="text-xs text-gray-500">{patientPhone}</div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{appointment.date}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {doctor?.name || 'Unassigned'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {doctor?.specialization || 'No doctor selected'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{appointment.date || appointment.requestedDate}</div>
                       <div className="flex items-center text-sm text-gray-500">
                         <Clock className="h-4 w-4 mr-1" />
-                        {appointment.time}
+                        {appointment.time || appointment.requestedTime || 'TBD'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

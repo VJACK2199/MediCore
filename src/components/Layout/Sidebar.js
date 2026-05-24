@@ -104,10 +104,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               );
             })}
 
-            <button className="sidebar-item w-full">
+            <Link
+              to="/settings"
+              className={`sidebar-item ${isActive('/settings') ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+            >
               <Settings className="h-5 w-5 mr-3" />
               Settings
-            </button>
+            </Link>
             <button
               onClick={logout}
               className="sidebar-item w-full text-red-600 hover:bg-red-50"

@@ -34,7 +34,7 @@ export const DataProvider = ({ children }) => {
       bloodGroup: 'A+',
       medicalHistory: 'Asthma',
       lastVisit: '2024-01-18',
-      status: 'Active'
+      status: 'Pending'
     },
     {
       id: 3,
@@ -46,7 +46,67 @@ export const DataProvider = ({ children }) => {
       bloodGroup: 'B+',
       medicalHistory: 'Heart Disease, Arthritis',
       lastVisit: '2024-01-12',
-      status: 'Active'
+      status: 'Consulting'
+    },
+    {
+      id: 4,
+      name: 'Baburao Ganpatrao Apte',
+      age: 54,
+      gender: 'Male',
+      email: 'star_garage@gmail.com',
+      phone: '+91 172-2549807',
+      bloodGroup: 'B+',
+      medicalHistory: 'Hearing loss, sinus infection',
+      lastVisit: '2026-05-26',
+      status: 'Emergency'
+    },
+    {
+      id: 5,
+      name: 'Aisha Khan',
+      age: 29,
+      gender: 'Female',
+      email: 'aisha.khan@akruti.com',
+      phone: '+91 98112 33445',
+      bloodGroup: 'A-',
+      medicalHistory: 'Skin allergy, dermatitis',
+      lastVisit: '2026-05-20',
+      status: 'Pending'
+    },
+    {
+      id: 6,
+      name: 'Rohan Mehta',
+      age: 38,
+      gender: 'Male',
+      email: 'rohan.mehta@akruti.com',
+      phone: '+91 98765 12345',
+      bloodGroup: 'O-',
+      medicalHistory: 'Back pain, joint stiffness',
+      lastVisit: '2026-05-22',
+      status: 'Consulting'
+    },
+    {
+      id: 7,
+      name: 'Priya Nair',
+      age: 27,
+      gender: 'Female',
+      email: 'priya.nair@akruti.com',
+      phone: '+91 94444 66221',
+      bloodGroup: 'AB+',
+      medicalHistory: 'Migraine, dizziness',
+      lastVisit: '2026-05-21',
+      status: 'In Process'
+    },
+    {
+      id: 8,
+      name: 'Nisha Sharma',
+      age: 48,
+      gender: 'Female',
+      email: 'nisha.sharma@akruti.com',
+      phone: '+91 99876 55443',
+      bloodGroup: 'O+',
+      medicalHistory: 'High blood pressure, chest pain',
+      lastVisit: '2026-05-24',
+      status: 'Closed'
     }
   ]);
 
@@ -84,13 +144,82 @@ export const DataProvider = ({ children }) => {
       schedule: ['Tue-Thu: 10AM-4PM'],
       patients: 38
     }
+  ,
+    {
+      id: 4,
+      name: 'Dr. Arjun Patel',
+      specialization: 'Cardiology',
+      experience: 10,
+      email: 'arjun.patel@akruti.com',
+      phone: '+91 98765 43210',
+      available: true,
+      schedule: ['Mon-Wed: 10AM-4PM', 'Fri: 2PM-6PM'],
+      patients: 54
+    },
+    {
+      id: 5,
+      name: 'Dr. Priya Sharma',
+      specialization: 'Dermatology',
+      experience: 7,
+      email: 'priya.sharma@akruti.com',
+      phone: '+91 91234 56789',
+      available: false,
+      schedule: ['Tue-Thu: 11AM-3PM'],
+      patients: 27
+    },
+    {
+      id: 6,
+      name: 'Dr. Ravi Kumar',
+      specialization: 'Orthopedics',
+      experience: 14,
+      email: 'ravi.kumar@akruti.com',
+      phone: '+91 99887 66554',
+      available: true,
+      schedule: ['Mon-Fri: 9AM-2PM'],
+      patients: 88
+    },
+    {
+      id: 7,
+      name: 'Dr. Sangeeta Rao',
+      specialization: 'Gynecology',
+      experience: 11,
+      email: 'sangeeta.rao@akruti.com',
+      phone: '+91 90123 45678',
+      available: false,
+      schedule: ['Wed-Fri: 1PM-5PM'],
+      patients: 33
+    },
+    {
+      id: 8,
+      name: 'Dr. Amit Verma',
+      specialization: 'ENT',
+      experience: 9,
+      email: 'amit.verma@akruti.com',
+      phone: '+91 90909 09090',
+      available: true,
+      schedule: ['Tue-Sat: 10AM-4PM'],
+      patients: 41
+    },
+    {
+      id: 9,
+      name: 'Dr. Neha Singh',
+      specialization: 'Neurology',
+      experience: 13,
+      email: 'neha.singh@akruti.com',
+      phone: '+91 94444 33322',
+      available: true,
+      schedule: ['Mon, Thu: 9AM-1PM', 'Fri: 3PM-6PM'],
+      patients: 58
+    }
   ]);
 
   const [appointments, setAppointments] = useState([
     {
       id: 1,
+      token: 'AKR-1001',
       patientId: 1,
       doctorId: 1,
+      department: 'Cardiology',
       date: '2024-01-20',
       time: '10:00 AM',
       status: 'confirmed',
@@ -99,13 +228,75 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 2,
+      token: 'AKR-1002',
       patientId: 2,
       doctorId: 2,
+      department: 'General Medicine',
       date: '2024-01-21',
       time: '2:00 PM',
       status: 'pending',
       type: 'Follow-up',
       notes: 'Review test results'
+    },
+    {
+      id: 3,
+      token: 'AKR-2001',
+      patientId: 4,
+      doctorId: 8,
+      department: 'ENT',
+      date: '2026-05-26',
+      time: '11:00 AM',
+      status: 'confirmed',
+      type: 'Follow-up',
+      notes: 'Sinus infection review and hearing evaluation'
+    },
+    {
+      id: 4,
+      token: 'AKR-2002',
+      patientId: 5,
+      doctorId: 5,
+      department: 'Dermatology',
+      date: '2026-05-20',
+      time: '10:30 AM',
+      status: 'confirmed',
+      type: 'Consultation',
+      notes: 'Skin allergy treatment and medication review'
+    },
+    {
+      id: 5,
+      token: 'AKR-2003',
+      patientId: 6,
+      doctorId: 6,
+      department: 'Orthopedics',
+      date: '2026-05-22',
+      time: '12:00 PM',
+      status: 'pending',
+      type: 'Consultation',
+      notes: 'Back pain evaluation and joint stiffness management'
+    },
+    {
+      id: 6,
+      token: 'AKR-2004',
+      patientId: 7,
+      doctorId: 9,
+      department: 'Neurology',
+      date: '2026-05-21',
+      time: '3:30 PM',
+      status: 'confirmed',
+      type: 'Consultation',
+      notes: 'Migraine and dizziness assessment'
+    },
+    {
+      id: 7,
+      token: 'AKR-2005',
+      patientId: 8,
+      doctorId: 4,
+      department: 'Cardiology',
+      date: '2026-05-24',
+      time: '2:30 PM',
+      status: 'confirmed',
+      type: 'Consultation',
+      notes: 'Hypertension and chest pain evaluation'
     }
   ]);
 

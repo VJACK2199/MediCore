@@ -15,8 +15,10 @@ import {
 } from 'lucide-react';
 
 const PatientManagement = () => {
-  const { patients, setPatients } = useData();
+  const { patients, setPatients, doctors, appointments } = useData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
   const [formData, setFormData] = useState({
@@ -27,14 +29,26 @@ const PatientManagement = () => {
     phone: '',
     bloodGroup: 'O+',
     medicalHistory: '',
-    address: ''
+    address: '',
+    status: 'Active'
   });
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.phone.includes(searchTerm)
-  );
+  const statusOptions = ['Active', 'Pending', 'In Process', 'Consulting', 'Emergency', 'Closed', 'Inactive'];
+  const statusFilterOptions = ['All', ...statusOptions];
+
+  const filteredPatients = patients.filter((patient) => {
+    const matchesSearch =
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.phone.includes(searchTerm);
+    const matchesStatus = statusFilter === 'All' || patient.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleStatusCardClick = (status) => {
+    setStatusFilter(status);
+    setShowFilters(true);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,7 +65,7 @@ const PatientManagement = () => {
         id: Date.now(),
         ...formData,
         lastVisit: new Date().toISOString().split('T')[0],
-        status: 'Active'
+        status: formData.status || 'Active'
       };
       setPatients([...patients, newPatient]);
     }
@@ -64,7 +78,8 @@ const PatientManagement = () => {
       phone: '',
       bloodGroup: 'O+',
       medicalHistory: '',
-      address: ''
+      address: '',
+      status: 'Active'
     });
     setShowAddForm(false);
   };
@@ -79,7 +94,8 @@ const PatientManagement = () => {
       phone: patient.phone,
       bloodGroup: patient.bloodGroup,
       medicalHistory: patient.medicalHistory,
-      address: patient.address || ''
+      address: patient.address || '',
+      status: patient.status || 'Active'
     });
     setShowAddForm(true);
   };
@@ -87,6 +103,41 @@ const PatientManagement = () => {
   const handleDelete = (patientId) => {
     if (window.confirm('Are you sure you want to delete this patient?')) {
       setPatients(patients.filter(patient => patient.id !== patientId));
+    }
+  };
+
+  const statusCounts = statusOptions.reduce((acc, status) => {
+    acc[status] = patients.filter(p => p.status === status).length;
+    return acc;
+  }, {});
+
+  const getAssignedDoctorName = (patientId) => {
+    const patientAppointments = appointments
+      .filter((appointment) => appointment.patientId === patientId)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    const latestAppointment = patientAppointments[0];
+    if (!latestAppointment) {
+      return 'Unassigned';
+    }
+    const doctor = doctors.find((doc) => doc.id === latestAppointment.doctorId);
+    return doctor ? doctor.name : 'Unknown Doctor';
+  };
+
+  const getPatientStatusClass = (status) => {
+    switch (status) {
+      case 'Emergency':
+        return 'bg-red-100 text-red-800';
+      case 'Consulting':
+        return 'bg-blue-100 text-blue-800';
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'In Process':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'Closed':
+      case 'Inactive':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-green-100 text-green-800';
     }
   };
 
@@ -105,6 +156,21 @@ const PatientManagement = () => {
           <Plus className="h-4 w-4 mr-2" />
           Add Patient
         </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        {statusOptions.map((status) => (
+          <button
+            key={status}
+            type="button"
+            onClick={() => handleStatusCardClick(status)}
+            className="card p-4 text-left text-left hover:shadow-lg transition-shadow duration-150"
+          >
+            <p className="text-sm font-medium text-gray-500">{status}</p>
+            <p className="mt-2 text-2xl font-semibold text-gray-900">{statusCounts[status] || 0}</p>
+            <p className="mt-2 text-xs text-gray-400">Filter by this status</p>
+          </button>
+        ))}
       </div>
 
       {/* Add/Edit Patient Form */}
@@ -251,6 +317,21 @@ const PatientManagement = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                className="input"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              >
+                {statusOptions.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
@@ -283,11 +364,46 @@ const PatientManagement = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn btn-secondary px-4 py-2">
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="btn btn-secondary px-4 py-2"
+          >
             <Filter className="h-4 w-4 mr-2" />
-            Filter
+            {showFilters ? 'Hide Filters' : 'Filter'}
           </button>
         </div>
+
+        {showFilters && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                className="input w-full"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                {statusFilterOptions.map((statusOption) => (
+                  <option key={statusOption} value={statusOption}>
+                    {statusOption}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="md:col-span-2 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setStatusFilter('All')}
+                className="btn btn-secondary px-4 py-2"
+              >
+                Clear Filter
+              </button>
+              <div className="flex items-center text-sm text-gray-500">
+                Showing {filteredPatients.length} of {patients.length} patients
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Patients Table */}
@@ -301,6 +417,9 @@ const PatientManagement = () => {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Assigned Doctor
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Medical Info
@@ -341,6 +460,10 @@ const PatientManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{getAssignedDoctorName(patient.id)}</div>
+                    <div className="text-sm text-gray-500">Doctor assigned</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">Blood: {patient.bloodGroup}</div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">
                       {patient.medicalHistory || 'No history recorded'}
@@ -353,7 +476,7 @@ const PatientManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPatientStatusClass(patient.status)}`}>
                       {patient.status}
                     </span>
                   </td>

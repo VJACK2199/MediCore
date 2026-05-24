@@ -20,6 +20,12 @@ const Dashboard = () => {
   const { patients, doctors, appointments, medicines, beds } = useData();
   const { user } = useAuth();
 
+  const totalAppointments = appointments.length;
+  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed').length;
+  const pendingAppointments = appointments.filter(apt => apt.status === 'pending').length;
+  const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
+  const cancelledAppointments = appointments.filter(apt => apt.status === 'cancelled').length;
+
   const statsCards = [
     {
       title: 'Total Patients',
@@ -31,8 +37,14 @@ const Dashboard = () => {
       link: '/patients'
     },
     {
-      title: 'Appointments Today',
-      value: appointments.filter(apt => apt.status === 'confirmed').length,
+      title: 'Appointments',
+      value: totalAppointments,
+      meta: [
+        confirmedAppointments ? `${confirmedAppointments} confirmed` : null,
+        pendingAppointments ? `${pendingAppointments} pending` : null,
+        completedAppointments ? `${completedAppointments} completed` : null,
+        cancelledAppointments ? `${cancelledAppointments} cancelled` : null
+      ].filter(Boolean).join(' · '),
       change: '+5%',
       changeType: 'increase',
       icon: Calendar,
@@ -134,6 +146,9 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">{card.title}</p>
                   <p className="text-2xl font-bold text-gray-900 mt-1">{card.value}</p>
+                  {card.meta && (
+                    <p className="text-xs text-gray-500 mt-1">{card.meta}</p>
+                  )}
                   <div className="flex items-center mt-2">
                     {card.changeType === 'increase' ? (
                       <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
