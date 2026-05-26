@@ -4,7 +4,7 @@ import { useData } from '../contexts/DataContext';
 import { Stethoscope, Mail, Phone, Calendar, Clock } from 'lucide-react';
 
 const PatientBooking = () => {
-  const { appointments, setAppointments } = useData();
+  const { appointments, setAppointments, doctors, patients, setPatients } = useData();
   const [formData, setFormData] = useState({
     patientName: '',
     patientEmail: '',
@@ -40,26 +40,53 @@ const PatientBooking = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const token = `AKR-${Math.floor(1000 + Math.random() * 9000)}`;
+    const departmentDoctors = doctors.filter((doctor) =>
+      doctor.specialization === formData.department
+    );
 
-    const newAppointment = {
+    const availableDoctors = departmentDoctors.length > 0 ? departmentDoctors : doctors;
+
+    const doctorQueueCounts = availableDoctors.map((doctor) => ({
+      doctor,
+      count: appointments.filter((appointment) => appointment.doctorId === doctor.id).length
+    }));
+
+    const assignedDoctor = doctorQueueCounts.sort((a, b) => a.count - b.count)[0]?.doctor || availableDoctors[0];
+
+    const queueNumber = appointments.filter((appointment) => appointment.doctorId === assignedDoctor.id).length + 1;
+    const token = `${assignedDoctor.token}-P${String(queueNumber).padStart(3, '0')}`;
+
+    const newPatient = {
       id: Date.now(),
+      name: formData.patientName,
+      age: null,
+      gender: 'Unknown',
+      email: formData.patientEmail,
+      phone: formData.patientPhone,
+      bloodGroup: 'Unknown',
+      medicalHistory: formData.reason,
+      lastVisit: new Date().toISOString().split('T')[0],
+      status: 'Pending',
       token,
-      patientName: formData.patientName,
-      patientEmail: formData.patientEmail,
-      patientPhone: formData.patientPhone,
-      department: formData.department,
-      requestedDate: formData.requestedDate,
-      requestedTime: formData.requestedTime,
-      type: 'Patient Request',
-      notes: formData.reason,
-      status: 'pending',
-      doctorId: null,
-      patientId: null
+      assignedDoctorId: assignedDoctor.id
     };
 
+    const newAppointment = {
+      id: Date.now() + 1,
+      token,
+      patientId: newPatient.id,
+      doctorId: assignedDoctor.id,
+      department: formData.department,
+      date: formData.requestedDate,
+      time: formData.requestedTime,
+      status: 'pending',
+      type: 'Patient Request',
+      notes: formData.reason
+    };
+
+    setPatients([newPatient, ...patients]);
     setAppointments([newAppointment, ...appointments]);
-    setSuccessMessage(`Your appointment request has been created. Use token ${token} for staff assignment.`);
+    setSuccessMessage(`Appointment booked with ${assignedDoctor.name}. Your token is ${token}.`);
     setFormData({
       patientName: '',
       patientEmail: '',
@@ -94,6 +121,14 @@ const PatientBooking = () => {
                     Login here.
                   </Link>
                 </p>
+                <div className="mt-6">
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-primary-700 shadow-sm hover:bg-slate-100 transition"
+                  >
+                    Staff / Doctor / Admin Login
+                  </Link>
+                </div>
               </div>
             </div>
             <div className="px-8 py-10">

@@ -123,6 +123,35 @@ const PatientManagement = () => {
     return doctor ? doctor.name : 'Unknown Doctor';
   };
 
+  const getPatientToken = (patientId) => {
+    const patientAppointments = appointments
+      .filter((appointment) => appointment.patientId === patientId)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    const latestAppointment = patientAppointments[0];
+    
+    if (!latestAppointment) {
+      return 'UNASSIGNED-000';
+    }
+    
+    const doctor = doctors.find((doc) => doc.id === latestAppointment.doctorId);
+    if (!doctor) {
+      return 'UNKNOWN-000';
+    }
+    
+    // Get all patients assigned to this doctor, sorted by appointment date
+    const patientsForDoctor = appointments
+      .filter((apt) => apt.doctorId === latestAppointment.doctorId)
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .map((apt) => apt.patientId)
+      .filter((id, index, arr) => arr.indexOf(id) === index);
+    
+    // Find this patient's sequential number
+    const patientIndex = patientsForDoctor.indexOf(patientId);
+    const sequentialNumber = String(patientIndex + 1).padStart(3, '0');
+    
+    return `${doctor.token}-P${sequentialNumber}`;
+  };
+
   const getPatientStatusClass = (status) => {
     switch (status) {
       case 'Emergency':
@@ -416,6 +445,9 @@ const PatientManagement = () => {
                   Patient
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Token
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -447,6 +479,11 @@ const PatientManagement = () => {
                         <div className="text-sm font-medium text-gray-900">{patient.name}</div>
                         <div className="text-sm text-gray-500">{patient.age} years, {patient.gender}</div>
                       </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="inline-flex items-center bg-blue-50 px-3 py-1 rounded-full">
+                      <span className="text-sm font-semibold text-blue-700">{getPatientToken(patient.id)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -113,6 +113,7 @@ export const DataProvider = ({ children }) => {
   const [doctors, setDoctors] = useState([
     {
       id: 1,
+      token: 'DOC-EC-001',
       name: 'Dr. Emily Chen',
       specialization: 'Cardiology',
       experience: 12,
@@ -124,6 +125,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 2,
+      token: 'DOC-RW-002',
       name: 'Dr. Robert Wilson',
       specialization: 'General Medicine',
       experience: 8,
@@ -135,6 +137,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 3,
+      token: 'DOC-MG-003',
       name: 'Dr. Maria Garcia',
       specialization: 'Pediatrics',
       experience: 15,
@@ -147,6 +150,7 @@ export const DataProvider = ({ children }) => {
   ,
     {
       id: 4,
+      token: 'DOC-AP-004',
       name: 'Dr. Arjun Patel',
       specialization: 'Cardiology',
       experience: 10,
@@ -158,6 +162,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 5,
+      token: 'DOC-PS-005',
       name: 'Dr. Priya Sharma',
       specialization: 'Dermatology',
       experience: 7,
@@ -169,6 +174,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 6,
+      token: 'DOC-RK-006',
       name: 'Dr. Ravi Kumar',
       specialization: 'Orthopedics',
       experience: 14,
@@ -180,6 +186,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 7,
+      token: 'DOC-SR-007',
       name: 'Dr. Sangeeta Rao',
       specialization: 'Gynecology',
       experience: 11,
@@ -191,6 +198,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 8,
+      token: 'DOC-AV-008',
       name: 'Dr. Amit Verma',
       specialization: 'ENT',
       experience: 9,
@@ -202,6 +210,7 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 9,
+      token: 'DOC-NS-009',
       name: 'Dr. Neha Singh',
       specialization: 'Neurology',
       experience: 13,
@@ -240,6 +249,18 @@ export const DataProvider = ({ children }) => {
     },
     {
       id: 3,
+      token: 'AKR-1003',
+      patientId: 3,
+      doctorId: 3,
+      department: 'Pediatrics',
+      date: '2026-05-25',
+      time: '9:30 AM',
+      status: 'confirmed',
+      type: 'Consultation',
+      notes: 'Pediatric checkup and general examination'
+    },
+    {
+      id: 4,
       token: 'AKR-2001',
       patientId: 4,
       doctorId: 8,
@@ -251,7 +272,7 @@ export const DataProvider = ({ children }) => {
       notes: 'Sinus infection review and hearing evaluation'
     },
     {
-      id: 4,
+      id: 5,
       token: 'AKR-2002',
       patientId: 5,
       doctorId: 5,
@@ -263,7 +284,7 @@ export const DataProvider = ({ children }) => {
       notes: 'Skin allergy treatment and medication review'
     },
     {
-      id: 5,
+      id: 7,
       token: 'AKR-2003',
       patientId: 6,
       doctorId: 6,
@@ -275,7 +296,7 @@ export const DataProvider = ({ children }) => {
       notes: 'Back pain evaluation and joint stiffness management'
     },
     {
-      id: 6,
+      id: 8,
       token: 'AKR-2004',
       patientId: 7,
       doctorId: 9,
@@ -287,7 +308,7 @@ export const DataProvider = ({ children }) => {
       notes: 'Migraine and dizziness assessment'
     },
     {
-      id: 7,
+      id: 9,
       token: 'AKR-2005',
       patientId: 8,
       doctorId: 4,

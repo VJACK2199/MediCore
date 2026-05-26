@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 const DoctorManagement = () => {
-  const { doctors, setDoctors } = useData();
+  const { doctors, setDoctors, appointments } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
@@ -94,6 +94,15 @@ const DoctorManagement = () => {
         ? { ...doctor, available: !doctor.available }
         : doctor
     ));
+  };
+
+  const getDoctorQueueCount = (doctorId) => 
+    appointments.filter((appointment) => appointment.doctorId === doctorId).length;
+
+  const getDoctorNextToken = (doctor) => {
+    const queueCount = getDoctorQueueCount(doctor.id);
+    const nextNumber = String(queueCount + 1).padStart(3, '0');
+    return `${doctor.token}-P${nextNumber}`;
   };
 
   const specializations = ['Cardiology', 'General Medicine', 'Pediatrics', 'Orthopedics', 'Neurology', 'Dermatology', 'Psychiatry', 'Surgery'];
@@ -354,12 +363,18 @@ const DoctorManagement = () => {
                 <Clock className="h-4 w-4 mr-2" />
                 {doctor.schedule.join(', ')}
               </div>
+              <div className="flex items-center text-sm text-gray-600">
+                <span className="inline-flex px-2 py-1 bg-slate-100 text-slate-700 rounded-full mr-2">
+                  {doctor.token}
+                </span>
+                <span className="text-slate-500">Next token: {getDoctorNextToken(doctor)}</span>
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
               <div className="flex items-center text-sm text-gray-600">
                 <Users className="h-4 w-4 mr-1" />
-                {doctor.patients} patients
+                {getDoctorQueueCount(doctor.id)} patients
               </div>
               <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                 doctor.available 
